@@ -20,7 +20,7 @@ public class LruCache<TKey, TValue>: ICache<TKey, TValue>
         value = hasKey ? node.Value : default;
         
         //moving process to the front of the linkedlist
-        if (node == _head)
+        if (!hasKey || node == _head)
         {
             return hasKey;
         }
