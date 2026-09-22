@@ -111,7 +111,43 @@ public class LruCache<TKey, TValue>: ICache<TKey, TValue>
 
     public bool TryRemoveValue(TKey key)
     {
-        throw new NotImplementedException();
+        bool hasKey = LruQueue.TryGetValue(key, out Node<TKey, TValue> node);
+
+        if (!hasKey)
+        {
+            return hasKey;
+        }
+        else
+        {
+            LruQueue.Remove(key);
+
+            if (_head == _tail)
+            {
+                _head = null;
+                _tail = null;
+            }
+            else if (node == _head)
+            {
+                node.Next.Prev = null;
+                _head = node.Next;
+                node.Next = null;
+            }
+            else if (node == _tail)
+            {
+                node.Prev.Next = null;
+                _tail = node.Prev;
+                node.Prev = null;
+            }
+            else
+            {
+                node.Prev.Next = node.Next;
+                node.Next.Prev = node.Prev;
+                node.Prev = null;
+                node.Next = null;
+            }
+        }
+
+        return hasKey;
     }
 
     //HELPER METHODS
