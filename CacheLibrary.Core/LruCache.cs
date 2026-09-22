@@ -16,7 +16,7 @@ public class LruCache<TKey, TValue>: ICache<TKey, TValue>
     public bool TryGetValue(TKey key, out TValue value)
     {
         //Checking and then fetching the value
-        var hasKey = LruQueue.TryGetValue(key, out Node <TKey, TValue> node);
+        bool hasKey = LruQueue.TryGetValue(key, out Node <TKey, TValue> node);
         value = hasKey ? node.Value : default;
         
         
