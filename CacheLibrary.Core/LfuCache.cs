@@ -40,7 +40,61 @@ public class LfuCache <TKey , TValue> : ICache<TKey , TValue>
 
     public bool TrySetValue(TKey key, TValue value)
     {
-        throw new NotImplementedException();
+        //Case 1 existing key
+        bool hasKey = LfuQueue.TryGetValue(key, out LfuNode <TKey, TValue> lfuNode);
+        
+        if (hasKey)
+        {
+            //set the new value and increment the count
+            bool isRemoved = RemoveFromFreqBucket(lfuNode);
+            lfuNode.Value = value;
+            lfuNode.Count++;
+            InsertIntoBucket(lfuNode.Count, lfuNode);
+
+            if (isRemoved)
+            {
+                //Reset the minimum frequency
+                _minFrequency++;
+            }
+            
+            return hasKey;
+        }
+        else
+        {
+            int currentCapacity = LfuQueue.Count;
+            var newLfuNode = new LfuNode<TKey, TValue>(key, value);
+            
+            if (currentCapacity < _cacheCapacity)
+            {
+                //Case 2 new key under capacity 
+                InsertIntoBucket(newLfuNode.Count, newLfuNode);
+                LfuQueue.Add(key, newLfuNode);
+                
+            }
+            else
+            {
+                //case 3 new key over capacity  remove lfu from lfuqueue
+                FrequencyLists.TryGetValue(_minFrequency, out var minFreqBucket);
+                var nodeToBeRemoved = minFreqBucket.Tail;
+                bool isRemoved = RemoveFromFreqBucket(nodeToBeRemoved);
+                LfuQueue.Remove(nodeToBeRemoved.Key);
+                
+                InsertIntoBucket(newLfuNode.Count, newLfuNode);
+                LfuQueue.Add(key, newLfuNode);
+                
+                if (isRemoved)
+                {
+                    _minFrequency++;
+                }
+            }
+            
+            if (newLfuNode.Count < _minFrequency)
+            {
+                _minFrequency = newLfuNode.Count;
+            }
+        }
+
+        return true;
     }
 
     public bool TryRemoveValue(TKey key)
