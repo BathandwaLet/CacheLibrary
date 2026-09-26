@@ -99,7 +99,25 @@ public class LfuCache <TKey , TValue> : ICache<TKey , TValue>
 
     public bool TryRemoveValue(TKey key)
     {
-        throw new NotImplementedException();
+        //Case 1 has key
+        bool hasKey = LfuQueue.TryGetValue(key, out LfuNode <TKey, TValue> lfuNode);
+        
+        if (hasKey)
+        {
+            bool isRemoved = RemoveFromFreqBucket(lfuNode);
+
+            // If removed now search for the new minimum frequency or reset to 1 O(n) operation.
+            if (isRemoved)
+            {
+                _minFrequency = FrequencyLists.Count > 0? FrequencyLists.Keys.Min(): 1;
+            }
+
+            LfuQueue.Remove(key);
+
+        }
+        //Case 2 no key
+        return hasKey;
+
     }
     
     //HELPER METHODS
