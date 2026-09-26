@@ -26,18 +26,14 @@ public class LfuCache <TKey , TValue> : ICache<TKey , TValue>
         }
         else
         {
-            // if yes then
-            //1 remove from the previous list into n + 1
-            FrequencyLists.Remove(key);
-            //2 increase the node count, 3 add to the n + 1
-            if (_minFrequency ==
-                lfuNode.Count && /*check the number of items frequency list possibly add var to track this*/)
+            var isRemoved = RemoveFromFreqBucket(lfuNode);
+            lfuNode.Count++;
+            InsertIntoBucket(lfuNode.Count, lfuNode);
+
+            if (isRemoved)
             {
                 _minFrequency++;
             }
-            FrequencyLists.Add(lfuNode.Count++, lfuNode);
-            
-
         }
         return hasKey;
     }
