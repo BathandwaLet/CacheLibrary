@@ -10,7 +10,8 @@ public class TtlCache<TKey, TValue>: ICache<TKey, TValue>
 
     public TtlCache(int cacheCapacity)
     {
-        _cacheCapacity = cacheCapacity;
+        //safeguard and reject a cacheCapacity less than 1
+        _cacheCapacity = cacheCapacity < 1 ? 1 : cacheCapacity;
     }
     public bool TryGetValue(TKey key, out TValue value)
     {
@@ -88,7 +89,7 @@ public class TtlCache<TKey, TValue>: ICache<TKey, TValue>
 
     public bool TryRemoveValue(TKey key)
     {
-        throw new NotImplementedException();
+        
     }
     
     //Helper Methods
