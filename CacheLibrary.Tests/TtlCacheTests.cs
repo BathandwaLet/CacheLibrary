@@ -5,31 +5,31 @@ namespace CacheLibrary.Tests;
 
 public class TtlCacheTests
 {
-    /*
-     TryGetValue
-       
-       1. Miss on an empty cache returns false.
-       2. Key set with a long duration returns true and the correct value straight away.
-       3. Key set with a short duration returns false after the duration passes, and the out value is default.
+    
+        //TryGetValue  
+       //1. Miss on an empty cache returns false.
+       //2. Key set with a long duration returns true and the correct value straight away.
+       //3. Key set with a short duration returns false after the duration passes, and the out value is default.
        [Fact]
        public void TryGetValue_KeyExpired_ReturnsFalse()
        {
            // Arrange
            var cache = new TtlCache<string, int>(3);
-           cache.TrySetValue("apple", 5, TimeSpan.FromMilliseconds(50));
+           cache.TrySetValue("testkey", 5, TimeSpan.FromMilliseconds(50));
 
            // Act
            Thread.Sleep(100);
-           var found = cache.TryGetValue("apple", out var value);
+           var found = cache.TryGetValue("testkey", out var value);
 
            // Assert
-           // 1. what should found be?
-           // 2. what should value be, given what TryGetValue does in the expired branch?
+           Assert.False(found);
+           Assert.Equal(0,value);
        }
-       4. A live hit moves the key to the head. Capacity 2: set a and b, get a, set c, then b should be evicted and a should survive.
-       5. Getting an expired key removes it from the cache. After the expired get, setting a new key into a full cache should not evict a live neighbour, 
-       because the expired one already freed its slot.
+       //4. A live hit moves the key to the head. Capacity 2: set a and b, get a, set c, then b should be evicted and a should survive.
+       //5. Getting an expired key removes it from the cache. After the expired get, setting a new key into a full cache should not evict a live neighbour, 
+       //because the expired one already freed its slot.
        
+       /*
        TrySetValue
        6. New key under capacity is retrievable afterwards.
        7. Existing live key updates the value and refreshes the expiry. Set a with a short duration, wait most of it, set a again with a longer duration, wait past the original expiry, and a should still be there.
