@@ -54,7 +54,31 @@ public class TtlCacheTests
            Assert.False(found);
            Assert.Equal(0,value);
        }
-       //4. A live hit moves the key to the head. Capacity 2: set a and b, get a, set c, then b should be evicted and a should survive.
+       
+       //4. A live hit moves the key to the head. Capacity 2: set a and b, get a, set c,
+       //then b should be evicted and a should survive.
+       [Fact]
+       public void TryGetValue_LiveHit_MovesKeyToHeadAndCacheEviction_ReturnsFalse()
+       {
+           //Arrange
+           var cache = new TtlCache<string,int>(2);
+           cache.TrySetValue("testkey", 6, TimeSpan.FromMilliseconds(50));
+           cache.TrySetValue("testkey1", 7,  TimeSpan.FromMilliseconds(55));
+           
+           //Act
+           var found = cache.TryGetValue("testkey", out var value);
+           cache.TrySetValue("testkey2", 8,  TimeSpan.FromMilliseconds(60));
+
+           var found1 = cache.TryGetValue("testkey2", out var value1);
+           var found2 = cache.TryGetValue("testkey1", out var value2);
+           
+           //Assert
+           Assert.True(found);
+           Assert.True(found1);
+           Assert.False(found2);
+           
+       }
+       
        //5. Getting an expired key removes it from the cache. After the expired get, setting a new key into a full cache should not evict a live neighbour, 
        //because the expired one already freed its slot.
        
