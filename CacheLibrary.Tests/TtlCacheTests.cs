@@ -21,7 +21,23 @@ public class TtlCacheTests
            //Assert
            Assert.False(found);
        }
+       
        //2. Key set with a long duration returns true and the correct value straight away.
+       [Fact]
+       public void TryGetValue_KeySetWithALongDuration_ReturnsTrue()
+       {
+           //Arrange
+           var cache = new TtlCache<string, int>(2);
+           cache.TrySetValue("testkey", 6, TimeSpan.FromMilliseconds(5000000));
+           
+           //Act
+           var found = cache.TryGetValue("testkey", out var value);
+
+           //Assert
+           Assert.True(found); 
+           Assert.Equal(6, value);
+       }
+       
        //3. Key set with a short duration returns false after the duration passes, and the out value is default.
        [Fact]
        public void TryGetValue_KeyExpired_ReturnsFalse()
