@@ -121,6 +121,24 @@ public class TtlCacheTests
            Assert.True(found);
        }
        //7. Existing live key updates the value and refreshes the expiry. Set a with a short duration, wait most of it, set a again with a longer duration, wait past the original expiry, and a should still be there.
+       [Fact]
+       public void TrySetValue_ExistingKeyUpdatesValueAndRefreshesTheExpiry_ReturnsTrue()
+       {
+           //Arrange
+           var cache = new TtlCache<string, int>(2);
+           cache.TrySetValue("testkey", 3, TimeSpan.FromMilliseconds(60));
+           
+           //Act
+           Thread.Sleep(50);
+           var isSet = cache.TrySetValue("testkey", 4, TimeSpan.FromMilliseconds(100));
+           Thread.Sleep(20);
+           
+           var found = cache.TryGetValue("testkey", out var value);
+           
+           //Assert
+           Assert.True(isSet);
+           Assert.True(found);
+       }
        
        //8. Existing expired key is treated as a new key. Set a, let it expire, set a again, get a and get the new value. This is the ghost node case, so also check that the count didn't drift by filling the cache to capacity afterwards.
        
