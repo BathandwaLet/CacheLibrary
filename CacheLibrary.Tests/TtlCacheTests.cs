@@ -105,7 +105,21 @@ public class TtlCacheTests
        
        //TrySetValue
        //6. New key under capacity is retrievable afterwards.
-       
+       [Fact]
+       public void TrySetValue_NewKey_UnderCapacity_ReturnsTrue()
+       {
+           //Arrange
+           var cache = new TtlCache<string, int>(2);
+           cache.TrySetValue("testkey", 6 , TimeSpan.FromMilliseconds(50));
+           
+           //Act
+           var isSet = cache.TrySetValue("testkey1", 7, TimeSpan.FromMilliseconds(51));
+           var found =  cache.TryGetValue("testkey1", out var value);
+           
+           //Assert
+           Assert.True(isSet);
+           Assert.True(found);
+       }
        //7. Existing live key updates the value and refreshes the expiry. Set a with a short duration, wait most of it, set a again with a longer duration, wait past the original expiry, and a should still be there.
        
        //8. Existing expired key is treated as a new key. Set a, let it expire, set a again, get a and get the new value. This is the ghost node case, so also check that the count didn't drift by filling the cache to capacity afterwards.
@@ -130,9 +144,9 @@ public class TtlCacheTests
 
        }
        
-       //12. RRemoving a missing key returns false.
+       //12. Removing an existing key key returns true and get the removed .
        [Fact]
-       public void TryRemoveValue_RemovesALiveKey_ReturnsTrue_GetReturnFalse()
+       public void TryRemoveValue_RemovesALiveKey_ReturnsTrue_TryGetValueReturnFalse()
        {
            //arrange
            var cache = new TtlCache<string, int>(2);
