@@ -9,7 +9,7 @@ public class LfuCache <TKey , TValue> : ICache<TKey , TValue>
 
     public LfuCache(int cacheCapacity)
     {
-        _cacheCapacity = cacheCapacity;
+        _cacheCapacity = cacheCapacity < 1 ? 1 : cacheCapacity;
         _minFrequency = 1;
     }
 
