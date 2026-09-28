@@ -1,0 +1,60 @@
+using Xunit;
+using CacheLibrary.Core;
+
+namespace CacheLibrary.Tests;
+
+public class TtlCacheTests
+{
+    /*
+     TryGetValue
+       
+       1. Miss on an empty cache returns false.
+       2. Key set with a long duration returns true and the correct value straight away.
+       3. Key set with a short duration returns false after the duration passes, and the out value is default.
+       [Fact]
+       public void TryGetValue_KeyExpired_ReturnsFalse()
+       {
+           // Arrange
+           var cache = new TtlCache<string, int>(3);
+           cache.TrySetValue("apple", 5, TimeSpan.FromMilliseconds(50));
+
+           // Act
+           Thread.Sleep(100);
+           var found = cache.TryGetValue("apple", out var value);
+
+           // Assert
+           // 1. what should found be?
+           // 2. what should value be, given what TryGetValue does in the expired branch?
+       }
+       4. A live hit moves the key to the head. Capacity 2: set a and b, get a, set c, then b should be evicted and a should survive.
+       5. Getting an expired key removes it from the cache. After the expired get, setting a new key into a full cache should not evict a live neighbour, 
+       because the expired one already freed its slot.
+       
+       TrySetValue
+       6. New key under capacity is retrievable afterwards.
+       7. Existing live key updates the value and refreshes the expiry. Set a with a short duration, wait most of it, set a again with a longer duration, wait past the original expiry, and a should still be there.
+       8. Existing expired key is treated as a new key. Set a, let it expire, set a again, get a and get the new value. This is the ghost node case, so also check that the count didn't drift by filling the cache to capacity afterwards.
+       9. New key at capacity with nothing expired evicts the LRU tail (the hybrid fallback).
+       10. The overload without a duration uses the default. Set a key with no duration and confirm it's still readable immediately.
+       */
+       //TryRemoveValue
+       //11. Removing a missing key returns false.
+       [Fact]
+       public void TryRemoveValue_RemovesAMissingKey_ReturnsFalse()
+       {
+           //Arrange
+           var cache = new TtlCache<string,int>(2);
+           
+           //Act
+           var found = cache.TryRemoveValue("testkey");
+           
+           //Assert
+           Assert.False(found);
+
+       }
+       
+       //12. Removing a live key returns true, and a later get returns false.
+       //13. Removing an expired key returns false (matching TryGetValue) but still cleans it up. Get afterwards also returns false.
+       //14. Removing the head, the tail, the middle and the only node each leave the list usable. Insert and get afterwards to prove it.
+    
+}
