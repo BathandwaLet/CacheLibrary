@@ -89,7 +89,17 @@ public class TtlCache<TKey, TValue>: ICache<TKey, TValue>
 
     public bool TryRemoveValue(TKey key)
     {
-        
+        bool hasKey = TtlQueue.TryGetValue(key, out TtlNode <TKey, TValue> ttlNode);
+        bool isExpired = hasKey != false && IsExpired(ttlNode);
+
+        if (hasKey)
+        {
+            RemoveFromLinkedList(ttlNode);
+            TtlQueue.Remove(ttlNode.Key);
+            return !isExpired;
+        }
+
+        return false;
     }
     
     //Helper Methods
