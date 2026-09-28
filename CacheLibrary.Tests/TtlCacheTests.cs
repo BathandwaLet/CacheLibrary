@@ -141,7 +141,32 @@ public class TtlCacheTests
        }
        
        //8. Existing expired key is treated as a new key. Set a, let it expire, set a again, get a and get the new value. This is the ghost node case, so also check that the count didn't drift by filling the cache to capacity afterwards.
-       
+       [Fact]
+       public void TrySetValue_UpdateExistingExpiredKey_Without_LeavingAGhostNode_ReturnsTrue()
+       {
+           //Arrange
+           var cache = new TtlCache<string, int>(3);
+           cache.TrySetValue("testkey", 1, TimeSpan.FromMilliseconds(60));
+           cache.TrySetValue("testkey1", 2, TimeSpan.FromMilliseconds(60000));
+           cache.TrySetValue("testkey2", 3, TimeSpan.FromMilliseconds(60000));
+           
+           //Act
+           Thread.Sleep(120);
+           var resetKey = cache.TrySetValue("testkey", 4, TimeSpan.FromMilliseconds(60000));
+           cache.TrySetValue("testkey3", 5, TimeSpan.FromMilliseconds(60000));
+           var foundTestKey = cache.TryGetValue("testkey", out var value1);
+           var foundTestKey1 = cache.TryGetValue("testkey1", out var value2);
+           var foundTestKey2 = cache.TryGetValue("testkey2", out var value3);
+           var foundTestKey3 = cache.TryGetValue("testkey3", out var value4);
+           
+            //Assert
+            Assert.True(resetKey);
+            Assert.False(foundTestKey1);
+            Assert.True(foundTestKey);
+            Assert.True(foundTestKey2);
+            Assert.True(foundTestKey3);
+            Assert.Equal(4, value1);
+       }
        //9. New key at capacity with nothing expired evicts the LRU tail (the hybrid fallback).
        
        //10. The overload without a duration uses the default. Set a key with no duration and confirm it's still readable immediately.
