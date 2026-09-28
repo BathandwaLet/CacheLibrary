@@ -81,15 +81,39 @@ public class TtlCacheTests
        
        //5. Getting an expired key removes it from the cache. After the expired get, setting a new key into a full cache should not evict a live neighbour, 
        //because the expired one already freed its slot.
+       [Fact]
+       public void TryGetValue_GetExpiredKey_RemoveFromCache()
+       {
+           //Arrange
+           var cache = new TtlCache<string, int>(2);
+           cache.TrySetValue("testkey", 6, TimeSpan.FromMilliseconds(50));
+           cache.TrySetValue("testkey1", 7, TimeSpan.FromMilliseconds(150));
+           
+           //Act
+           Thread.Sleep(70);
+           var foundTestKey = cache.TryGetValue("testkey", out var testKeyValue);
+           var foundTestKey1 = cache.TryGetValue("testkey1", out var testKeyValue1);
+           cache.TrySetValue("newtestkey", 8, TimeSpan.FromMilliseconds(100));
+           var foundNewKey = cache.TryGetValue("newtestkey", out var newKeyValue);
+           
+
+           //Assert
+            Assert.False(foundTestKey);
+            Assert.True(foundTestKey1);
+            Assert.True(foundNewKey);
+       }
        
-       /*
-       TrySetValue
-       6. New key under capacity is retrievable afterwards.
-       7. Existing live key updates the value and refreshes the expiry. Set a with a short duration, wait most of it, set a again with a longer duration, wait past the original expiry, and a should still be there.
-       8. Existing expired key is treated as a new key. Set a, let it expire, set a again, get a and get the new value. This is the ghost node case, so also check that the count didn't drift by filling the cache to capacity afterwards.
-       9. New key at capacity with nothing expired evicts the LRU tail (the hybrid fallback).
-       10. The overload without a duration uses the default. Set a key with no duration and confirm it's still readable immediately.
-       */
+       //TrySetValue
+       //6. New key under capacity is retrievable afterwards.
+       
+       //7. Existing live key updates the value and refreshes the expiry. Set a with a short duration, wait most of it, set a again with a longer duration, wait past the original expiry, and a should still be there.
+       
+       //8. Existing expired key is treated as a new key. Set a, let it expire, set a again, get a and get the new value. This is the ghost node case, so also check that the count didn't drift by filling the cache to capacity afterwards.
+       
+       //9. New key at capacity with nothing expired evicts the LRU tail (the hybrid fallback).
+       
+       //10. The overload without a duration uses the default. Set a key with no duration and confirm it's still readable immediately.
+       
        //TryRemoveValue
        //11. Removing a missing key returns false.
        [Fact]
