@@ -9,10 +9,9 @@ public class LruCache<TKey, TValue>: ICache<TKey, TValue>
 
     public LruCache(int cacheCapacity)
     {
-        _cacheCapacity = cacheCapacity;
+        _cacheCapacity = cacheCapacity < 1 ? 1 : cacheCapacity;
     }
-
-    //TODO get set remove to be defined
+    
     public bool TryGetValue(TKey key, out TValue value)
     {
         //Checking and then fetching the value
@@ -112,7 +111,8 @@ public class LruCache<TKey, TValue>: ICache<TKey, TValue>
     public bool TryRemoveValue(TKey key)
     {
         bool hasKey = LruQueue.TryGetValue(key, out Node<TKey, TValue> node);
-
+        
+        //TODO refactor to more concise version.
         if (!hasKey)
         {
             return hasKey;
