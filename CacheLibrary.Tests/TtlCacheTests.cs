@@ -53,7 +53,23 @@ public class TtlCacheTests
 
        }
        
-       //12. Removing a live key returns true, and a later get returns false.
+       //12. RRemoving a missing key returns false.
+       [Fact]
+       public void TryRemoveValue_RemovesALiveKey_ReturnsTrue_GetReturnFalse()
+       {
+           //arrange
+           var cache = new TtlCache<string, int>(2);
+           cache.TrySetValue("testkey", 1);
+           cache.TrySetValue("testkey2", 2);
+           
+           //act
+           var remove = cache.TryRemoveValue("testkey");
+           var getlater = cache.TryGetValue("testkey", out var value);
+           
+           //assert
+           Assert.True(remove);
+           Assert.False(getlater);
+       }
        //13. Removing an expired key returns false (matching TryGetValue) but still cleans it up. Get afterwards also returns false.
        //14. Removing the head, the tail, the middle and the only node each leave the list usable. Insert and get afterwards to prove it.
     
