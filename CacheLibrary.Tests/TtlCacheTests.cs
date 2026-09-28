@@ -8,6 +8,19 @@ public class TtlCacheTests
     
         //TryGetValue  
        //1. Miss on an empty cache returns false.
+       [Fact]
+       public void TryGetValue_MissOnEmptyCache_ReturnsFalse()
+       {
+           //Arrange
+           var cache = new TtlCache<string, int>(3);
+           
+           
+           //Act
+           var found = cache.TryGetValue("testkey", out var value);
+           
+           //Assert
+           Assert.False(found);
+       }
        //2. Key set with a long duration returns true and the correct value straight away.
        //3. Key set with a short duration returns false after the duration passes, and the out value is default.
        [Fact]
