@@ -36,7 +36,34 @@ public class LfuCacheTests
               Assert.True(isFound);
               Assert.Equal(1, value);
        }
-       // Hit increments count and moves node to a new bucket (verify indirectly — e.g. access key A twice, key B once, force eviction, confirm B was evicted not A)
+       
+       // Hit increments count and moves node to a new bucket
+       // (verify indirectly — e.g. access key A twice, key B once, force eviction, confirm B was evicted not A)
+       [Fact]
+       public void TryGetValue_CacheHitIncrementsAndMovesToHead_AddAnotherNode_EvictsLfuNode()
+       {
+              //arrange
+              var cache = new LfuCache<string, int>(2);
+              cache.TrySetValue("testkey", 1);
+              cache.TrySetValue("testkey1", 2);
+              
+              //act
+              int value;
+              cache.TryGetValue("testkey", out value);
+              cache.TryGetValue("testkey", out value);
+              cache.TryGetValue("testkey1", out int value1);
+              
+              cache.TrySetValue("testkey2", 3);
+
+              bool isEvicted = !cache.TryGetValue("testkey1", out value1);
+              bool teskeyStillPresent = cache.TryGetValue("testkey", out value);
+              
+              //assert
+              Assert.True(isEvicted);
+              Assert.True(teskeyStillPresent);
+              Assert.Equal(1, value);
+       }
+       
        // Hit on a key that's the only item in its bucket → bucket empties and gets removed correctly, no crash on subsequent operations
        
        //TrySetValue
