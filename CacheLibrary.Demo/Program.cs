@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using CacheLibrary.Core;
+using CacheLibrary.Demo;
 
 
 class Program
@@ -59,6 +60,135 @@ class Program
                 throw new InvalidOperationException(); 
                 break;
         }
+
+        ConsoleActions consoleAction = ConsoleActions.none;
         
+        while (true)
+        {
+            Console.WriteLine("Please enter:" +
+                              "\n'set' to set a new node to cache" +
+                              "\n'get' to get a node from cache" +
+                              "\n'remove' to remove a node from cache" +
+                              "\n'quit' to exit.");
+            
+            string consoleActionInput = Console.ReadLine()?.ToLower();
+
+            consoleAction = ParseActionToEnum(consoleActionInput);
+
+            bool selectedQuit = false;
+            
+            switch (consoleAction)
+            {
+                case ConsoleActions.set:
+                    //set the node
+                    Console.WriteLine("Enter a key value:");
+                    string? key = Console.ReadLine();
+
+                    int value;
+                    while (true)
+                    {
+                        Console.WriteLine("Enter a value:");
+
+                        if (!int.TryParse(Console.ReadLine(), out value))
+                        {
+                            Console.WriteLine("Invalid input.\nTry entering 1, 5 or 77.");
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    
+                    if (cache is TtlCache<string, int> ttlCache)
+                    {
+                        
+                        TimeSpan duration;
+                        while (true)
+                        {
+                            Console.WriteLine("Enter a duration in seconds:");
+
+                            if (!int.TryParse(Console.ReadLine(), out int durationInput))
+                            {
+                                Console.WriteLine("Invalid input.\nTry entering 1, 30 or 600.");
+                            }
+                            else
+                            {
+                                duration = TimeSpan.FromSeconds(durationInput);
+                                break;
+                            }
+                        }
+
+                        if (ttlCache.TrySetValue(key, value, duration))
+                        {
+                            Console.WriteLine($"{key} was successfully added to the cache.");
+                        }
+
+                    }
+                    else
+                    {
+                        
+                        if (cache.TrySetValue(key, value))
+                        {
+                            Console.WriteLine($"{key} was successfully added to the cache.");
+                        }
+                    }
+                    break;
+                
+                case ConsoleActions.get: 
+                    //get the node
+                    Console.WriteLine("Enter a key:");
+                    string? getKey = Console.ReadLine();
+
+                    if (cache.TryGetValue(getKey, out int getValue))
+                    {
+                        Console.WriteLine($"The key:{getKey} has a value of {getValue}.");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"{getKey} was not found in the cache.");
+                    }
+                    break;
+                
+                case ConsoleActions.remove:
+                    //remove the node
+                    Console.WriteLine("Enter a key:");
+                    string? removeKey = Console.ReadLine();
+                    if (cache.TryRemoveValue(removeKey))
+                    {
+                        Console.WriteLine($"The key:{removeKey} has been removed from cache.");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"{removeKey} was not found in the cache.");
+                    }
+                    break;
+                
+                case ConsoleActions.quit:
+                    selectedQuit = true;
+                    break;
+                
+                default:
+                    Console.WriteLine("Invalid input.");
+                    break;
+            }
+
+            if (selectedQuit)
+            {
+                break;
+            }
+        }
+        
+    }
+
+    private static ConsoleActions ParseActionToEnum (string input)
+    {
+        return input switch
+        {
+            "set" => ConsoleActions.set,
+            "get" => ConsoleActions.get,
+            "remove" => ConsoleActions.remove,
+            "quit" => ConsoleActions.quit,
+            _ => ConsoleActions.none
+        };
     }
 }
