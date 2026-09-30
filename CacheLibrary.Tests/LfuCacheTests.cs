@@ -22,7 +22,20 @@ public class LfuCacheTests
               Assert.False(isFound);
        }
        // Hit on existing key → true, correct value
-       
+       [Fact]
+       public void TryGetValue_GetValueThatExists_ReturnsTrue()
+       {
+              //arrange
+              var cache = new LfuCache<string, int>(2);
+              cache.TrySetValue("testkey", 1);
+              
+              //act
+              bool isFound = cache.TryGetValue("testkey", out int value);
+              
+              //assert
+              Assert.True(isFound);
+              Assert.Equal(1, value);
+       }
        // Hit increments count and moves node to a new bucket (verify indirectly — e.g. access key A twice, key B once, force eviction, confirm B was evicted not A)
        // Hit on a key that's the only item in its bucket → bucket empties and gets removed correctly, no crash on subsequent operations
        
