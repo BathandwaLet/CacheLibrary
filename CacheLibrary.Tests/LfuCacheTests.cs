@@ -65,6 +65,32 @@ public class LfuCacheTests
        }
        
        // Hit on a key that's the only item in its bucket → bucket empties and gets removed correctly, no crash on subsequent operations
+       [Fact]
+       public void TryGetValue_CacheHitOnTheOnlyItemInBucket()
+       {
+              //arrange
+              var cache = new LfuCache<string, int>(2);
+              cache.TrySetValue("key_1", 1);
+              cache.TrySetValue("key_2", 2);
+              
+              //act
+              cache.TryGetValue("key_1", out int value1);
+              cache.TryGetValue("key_1", out value1);
+              cache.TrySetValue("key_3", 3);
+              
+              bool key_1Present = cache.TryGetValue("key_1", out value1);
+              bool key_2Present = cache.TryGetValue("key_2", out int value2);
+              bool key_3Present = cache.TryGetValue("key_3", out int value3);
+              
+              //assert
+              Assert.True(key_1Present);
+              Assert.Equal(1, value1);
+              
+              Assert.False(key_2Present);
+              
+              Assert.True(key_3Present);
+              Assert.Equal(3, value3);
+       }
        
        //TrySetValue
        
