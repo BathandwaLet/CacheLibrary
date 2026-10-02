@@ -172,7 +172,7 @@ public class TtlCacheTests
        public void TrySetValue_NewKeyAtCapacity_EvictsTheLruKey()
        {
            //arrange 
-           var cache = new LruCache<string, int>(4);
+           var cache = new TtlCache<string, int>(4);
            cache.TrySetValue("One", 1);
            cache.TrySetValue("Two", 2);
            cache.TrySetValue("Three", 3);
