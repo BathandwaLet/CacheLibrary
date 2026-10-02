@@ -87,10 +87,10 @@ public class TtlCacheTests
            //Arrange
            var cache = new TtlCache<string, int>(2);
            cache.TrySetValue("testkey", 6, TimeSpan.FromMilliseconds(50));
-           cache.TrySetValue("testkey1", 7, TimeSpan.FromMilliseconds(150));
+           cache.TrySetValue("testkey1", 7, TimeSpan.FromMilliseconds(250));
            
            //Act
-           Thread.Sleep(70);
+           Thread.Sleep(100);
            var foundTestKey = cache.TryGetValue("testkey", out var testKeyValue);
            var foundTestKey1 = cache.TryGetValue("testkey1", out var testKeyValue1);
            cache.TrySetValue("newtestkey", 8, TimeSpan.FromMilliseconds(100));
@@ -168,8 +168,35 @@ public class TtlCacheTests
             Assert.Equal(4, value1);
        }
        //9. New key at capacity with nothing expired evicts the LRU tail (the hybrid fallback).
+       [Fact]
+       public void TrySetValue_NewKeyAtCapacity_EvictsTheLruKey()
+       {
+           //arrange 
+           var cache = new LruCache<string, int>(4);
+           cache.TrySetValue("One", 1);
+           cache.TrySetValue("Two", 2);
+           cache.TrySetValue("Three", 3);
+           cache.TrySetValue("Four", 4);
+           
+           //act
+           cache.TrySetValue("Five", 5);
+           bool key1_Present = cache.TryGetValue("One", out var value1);
+           bool key2_Present = cache.TryGetValue("Two", out var value2);
+           bool key3_Present = cache.TryGetValue("Three", out var value3);
+           bool key4_Present = cache.TryGetValue("Four", out var value4);
+           bool key5_Present = cache.TryGetValue("Five", out var value5);
+           
+           //assert
+           Assert.False(key1_Present);
+           Assert.True(key2_Present);
+           Assert.True(key3_Present);
+           Assert.True(key4_Present);
+           Assert.True(key5_Present);
+       }
        
        //10. The overload without a duration uses the default. Set a key with no duration and confirm it's still readable immediately.
+       
+       
        
        //TryRemoveValue
        //11. Removing a missing key returns false.
@@ -187,7 +214,7 @@ public class TtlCacheTests
 
        }
        
-       //12. Removing an existing key key returns true and get the removed .
+       //12. Removing an existing key returns true and get the removed .
        [Fact]
        public void TryRemoveValue_RemovesALiveKey_ReturnsTrue_TryGetValueReturnFalse()
        {
