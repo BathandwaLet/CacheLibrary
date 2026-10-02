@@ -195,7 +195,22 @@ public class TtlCacheTests
        }
        
        //10. The overload without a duration uses the default. Set a key with no duration and confirm it's still readable immediately.
-       
+       [Fact]
+       public void TrySetValue_OverloadingWithoutADurationUsesTheDefault_TryGetValue_ReturnsTrue()
+       {
+           //arrange
+           var cache = new TtlCache<string, int>(3);
+           cache.TrySetValue("One", 1);
+           cache.TrySetValue("Two", 2);
+           
+           //act
+           bool key_One = cache.TryGetValue("One", out var value1);
+           bool key_Two = cache.TryGetValue("Two", out var value2);
+           
+           //assert
+           Assert.True(key_One);
+           Assert.True(key_Two);
+       }
        
        
        //TryRemoveValue
