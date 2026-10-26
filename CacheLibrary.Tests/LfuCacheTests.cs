@@ -118,5 +118,31 @@ public class LfuCacheTests
        }
        // Remove existing key that's the sole item in its bucket → true, _minFrequency recalculates correctly if it was the min bucket
        // Remove existing key that's not alone in its bucket → true, bucket survives with remaining items intact
-     
+       [Fact]
+       public void TryRemoveValue_RemoveExistingKeyFromABucketWithAAnotherNodePresent_ReturnsTrue()
+       {
+              //arrange
+              var cache = new LfuCache<string, int>(3);
+              cache.TrySetValue("key_1", 1);
+              cache.TrySetValue("key_2", 2);
+              cache.TrySetValue("key_3", 3);
+              
+              //act
+              cache.TryGetValue("key_1", out int value1);
+              cache.TryGetValue("key_1", out value1);
+              cache.TryGetValue("key_1", out value1);
+              
+              cache.TryGetValue("key_2", out int value2);
+              cache.TryGetValue("key_2", out value2);
+              cache.TryGetValue("key_2", out value2);
+
+              bool key_1_isRemoved = cache.TryRemoveValue("key_1");
+              bool key_2_stillPresent = cache.TryGetValue("key_2", out value2);
+
+              //assert
+              Assert.True(key_1_isRemoved);
+              Assert.True(key_2_stillPresent);
+
+       }
+       
 }
