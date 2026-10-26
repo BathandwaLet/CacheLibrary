@@ -96,7 +96,7 @@ public class TtlCache<TKey, TValue>: ICache<TKey, TValue>
         {
             RemoveFromLinkedList(ttlNode);
             TtlQueue.Remove(ttlNode.Key);
-            return !isExpired;
+            return !isExpired && hasKey;
         }
 
         return false;
