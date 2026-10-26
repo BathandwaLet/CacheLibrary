@@ -103,6 +103,19 @@ public class LfuCacheTests
        //TryRemoveValue
        
        // Remove missing key → false
+       [Fact]
+       public void TryRemoveValue_RemoveMissingKey_ReturnsFalse()
+       {
+              //arrange
+              var cache = new LfuCache<string, int>(2);
+              cache.TrySetValue("key_1", 1);
+              
+              //act
+              var isRemoved = cache.TryRemoveValue("key_2");
+
+              //assert
+              Assert.False(isRemoved);
+       }
        // Remove existing key that's the sole item in its bucket → true, _minFrequency recalculates correctly if it was the min bucket
        // Remove existing key that's not alone in its bucket → true, bucket survives with remaining items intact
      
