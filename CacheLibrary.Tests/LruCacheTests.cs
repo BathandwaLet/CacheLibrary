@@ -81,11 +81,30 @@ public class LruCacheTests
     public void TryRemoveValue_RemovingTheHeadValue_ReturnsTrue()
     {
         //arrange
+        var cache = new LruCache<string, int>(3);
+        cache.TrySetValue("testkey1", 1);
+        cache.TrySetValue("testkey2", 2);
+        cache.TrySetValue("testkey3", 3);
         
         //act
+        int value1, value2, value3 = 0;
+        cache.TryGetValue("testkey1", out value1);
+        cache.TryGetValue("testkey2", out value2);
+        cache.TryGetValue("testkey2", out value2);
+        cache.TryGetValue("testkey3", out value3);
+        cache.TryGetValue("testkey3", out value3);
+        cache.TryGetValue("testkey3", out value3);
+        
+        bool isRemoved = cache.TryRemoveValue("testkey3");
+        bool stillInCache1 = cache.TryGetValue("testkey1", out value1);
+        bool stillInCache2 = cache.TryGetValue("testkey2", out value2);
+        bool stillInCache3 = cache.TryGetValue("testkey3", out value3);
         
         //assert
-        
+        Assert.True(isRemoved);
+        Assert.True(stillInCache1);
+        Assert.True(stillInCache2);
+        Assert.False(stillInCache3);
     }
     
     //Remove tail → _tail updates correctly
