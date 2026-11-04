@@ -43,13 +43,32 @@ public class LruCacheTests
         Assert.Equal(1, value);
     }
     
-    /*
-       TODO
-       Remaining TrySetValue test
-       Existing key → value updates, moves to head
-       New key, cache at capacity → evicts LRU (tail), new key becomes head
-       Single-item cache (capacity 1), insert second key → evicts the only item cleanly (your head==tail edge case)
-     */
+    
+    //TODO
+    //Remaining TrySetValue test
+    //Existing key → value updates, moves to head
+    
+    //New key, cache at capacity → evicts LRU (tail), new key becomes head
+    
+    //Single-item cache (capacity 1), insert second key → evicts the only item cleanly (your head==tail edge case)
+    [Fact]
+    public void TrySetValue_SingleItemCache_NewInsertion_EvictsThenAddNewKey_ReturnsTrue()
+    {
+        //arrange
+        var cache = new LruCache<string, int>(1);
+        cache.TrySetValue("testkey1", 1);
+
+        //act
+        bool setNewKey = cache.TrySetValue("testkey2", 2);
+        bool isRemovedT1 = cache.TryGetValue("testkey1", out int value1);
+        bool isRemovedT2 = cache.TryGetValue("testkey2", out int value2);
+        
+        //assert
+        Assert.True(setNewKey);
+        Assert.False(isRemovedT1);
+        Assert.True(isRemovedT2);
+
+    }
     
     //TryRemoveValue Tests
     
@@ -58,10 +77,20 @@ public class LruCacheTests
     //Remove missing key → false
     //Remove existing key (middle of list) → true, list stays valid
     //Remove head → _head updates correctly
+    [Fact]
+    public void TryRemoveValue_RemovingTheHeadValue_ReturnsTrue()
+    {
+        //arrange
+        
+        //act
+        
+        //assert
+        
+    }
     
     //Remove tail → _tail updates correctly
     [Fact]
-    public void TryRemoveValue_RemovingTheTailValue_ReturnsFalse()
+    public void TryRemoveValue_RemovingTheTailValue_ReturnsTrue()
     {
         //arrange
         var cache = new LruCache<string, int>(3);
@@ -93,7 +122,7 @@ public class LruCacheTests
     
     //Remove the only item in a single-item cache → _head/_tail both become null
     [Fact]
-    public void TryRemoveValue_RemovingTheOnlyItemInCache_HeadandTailBecomeNull()
+    public void TryRemoveValue_RemovingTheOnlyItemInCache_HeadandTailBecomeNull_ReturnsTrue()
     {
         //arrange
         var cache = new LruCache<string, int>(3);
