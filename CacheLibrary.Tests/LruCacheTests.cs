@@ -52,14 +52,44 @@ public class LruCacheTests
      */
     
     //TryRemoveValue Tests
-    /*
-      TODO
-      Remaining TryRemoveValue tests
-      Remove missing key → false
-      Remove existing key (middle of list) → true, list stays valid
-      Remove head → _head updates correctly
-      Remove tail → _tail updates correctly
-     */
+    
+    //TODO
+    //Remaining TryRemoveValue tests
+    //Remove missing key → false
+    //Remove existing key (middle of list) → true, list stays valid
+    //Remove head → _head updates correctly
+    
+    //Remove tail → _tail updates correctly
+    [Fact]
+    public void TryRemoveValue_RemovingTheTailValue_ReturnsFalse()
+    {
+        //arrange
+        var cache = new LruCache<string, int>(3);
+        cache.TrySetValue("testkey1", 1);
+        cache.TrySetValue("testkey2", 2);
+        cache.TrySetValue("testkey3", 3);
+        
+        //act
+        int value1, value2, value3 = 0;
+        cache.TryGetValue("testkey1", out value1);
+        cache.TryGetValue("testkey2", out value2);
+        cache.TryGetValue("testkey2", out value2);
+        cache.TryGetValue("testkey3", out value3);
+        cache.TryGetValue("testkey3", out value3);
+        cache.TryGetValue("testkey3", out value3);
+
+        bool isRemoved = cache.TryRemoveValue("testkey1");
+        bool stillInCache1 = cache.TryGetValue("testkey1", out value1);
+        bool stillInCache2 = cache.TryGetValue("testkey2", out value2);
+        bool stillInCache3 = cache.TryGetValue("testkey3", out value3);
+
+        //assert
+        Assert.True(isRemoved);
+        Assert.False(stillInCache1);
+        Assert.True(stillInCache2);
+        Assert.True(stillInCache3);
+
+    }
     
     //Remove the only item in a single-item cache → _head/_tail both become null
     [Fact]
